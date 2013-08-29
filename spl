@@ -1,0 +1,2 @@
+python splc.py $1 > a.out.spl.c
+gcc a.out.spl.c -lm

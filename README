@@ -1,0 +1,41 @@
+Spl
+===
+
+A Compiler for the Shakespeare Programming Language Written in Python. Compiles from SPL to C.
+
+This compiler implements most features of the Shakespeare Programming language described at
+http://shakespearelang.sourceforge.net/report/shakespeare/
+
+The following features have yet to be or may never be implemented:
+
+- Stacks (because who needs data structures in shakespeare, really?)
+- multiple-word nouns in cases where using just the last word would generate any confusion
+- Restriction of variable names to Shakespearean characters.
+- Enforcement of proper scene numberng.
+- Support variable declarations that go across multiple lines, but that won't be too hard to add later.
+
+This is the first release, some of these issues may be fixed in later releases. Also, the following are
+features not in the original Shakespeare specification that I plan to add:
+
+- Support for act/scene names in goto statements, so that one can write "let us return to the talk in the forest"
+  instead of "let us return to scene II" for instance.
+- Support for word replaces of functions: If the goal of Shakespeare i to make programs look like plays, then it
+  is sub-optimal having to use words like "square root" all over the place, so I may add a way to define equivalent
+  words for math functions in a text file.
+
+To use spl, simply run
+
+$ ./spl [Input File]
+
+Or, if you would like, you can run
+
+$ python splc.py [Input File] > [Output File]
+$ gcc [Output File] -lm
+$ ./a.out
+
+The spl script should work in any bash terminal, on Windows, the explicit python method should work if you have
+all of the right programs installed (other than ./a.out, I think on windows you would just type a.out)
+
+Depenencies:
+Python
+gcc
