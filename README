@@ -10,9 +10,7 @@ The following features have yet to be or may never be implemented:
 
 - Stacks (because who needs data structures in shakespeare, really?)
 - multiple-word nouns in cases where using just the last word would generate any confusion
-- Restriction of variable names to Shakespearean characters.
 - Enforcement of proper scene numberng.
-- Support variable declarations that go across multiple lines, but that won't be too hard to add later.
 
 This is the first release, some of these issues may be fixed in later releases. Also, the following are
 features not in the original Shakespeare specification that I plan to add:

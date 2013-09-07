@@ -12,8 +12,6 @@ drsam94@gmail.com"""
 #missing features
 
 #full support for multi-word nouns/names
-#naming restrictions on variables
-#support for multi-line variable declarations
 #other restrictions: e.g need for well-numbered scenes
 #Stacks (eh, I may never add these), who needs them?
 
@@ -23,6 +21,7 @@ pos_comp   = []
 neg_comp   = []
 pos_nouns  = []
 neg_nouns  = []
+valid_names= []
 zero_nouns = ['nothing', 'zero']
 src        = ""
 N          = 0
@@ -81,7 +80,7 @@ def beginsWith(s, pattern):
 def loadFileIntoList(filename, list):
 	f = open(filename, 'r')
 	for word in f.readlines():
-		list.append(word[:-1])
+		list.append(word.split(" ")[-1][:-1])
 	f.close()
 
 #load initial noun and adjective lists
@@ -94,6 +93,7 @@ def loadWordLists():
 	loadFileIntoList("include/negative_noun.wordlist", neg_nouns)
 	loadFileIntoList("include/positive_comparative.wordlist", pos_comp)
 	loadFileIntoList("include/positive_comparative.wordlist", neg_comp)
+	loadFileIntoList("include/character.wordlist", valid_names)
 
 roman_values = { 'M': 1000, 'D': 500, 'C': 1000, 'L': 50, 'X': 10, 'V': 5, 'I': 1 }
 def parseRomanNumeral(roman_string):
@@ -371,8 +371,35 @@ def writeScenes(scenes, isLast):
 			print "goto act" + str(actnum + 1) + ";\n"
 		print "}"
 	
-	#print "int act" + str(actnum) + "() {\nreturn act_" + str(actnum) + "_scene1();\n}"
+def handleDeclarations():
+	global N
+	global src
+	#variables, declaration syntax:
+	#Name, value
+	declarations = []
+	unfinished = False
+	while not beginsWithNoWhitespace(src[N], 'Act'):
+		Assert(N < len(src) - 1, "File contains no Acts")
+		if len(trimWhitespace(src[N])) > 0:
+			#print src[N]
+			if not unfinished:
+				declarations.append(src[N])
+			else:
+				declarations[-1] += src[N]
+			unfinished = src[N].find('.') < 0
+		N += 1
 
+	for dec in declarations:
+		commaIndex = dec.find(',')
+		Assert(commaIndex > 0, "Improper declaration")
+		wordsInName = trimLeadingWhitespace(dec[:commaIndex]).split(" ")
+		varname = wordsInName[-1]
+		value = parseNum(dec[commaIndex:-2])
+		print "int " + str(varname) + " = " + str(value) + ";"
+		Assert(varname in valid_names, "Non-Shakespearean variable name")
+		vartable.add(varname)
+
+#-------------------------------Begin Main Program-------------------------#
 Assert(len(sys.argv) > 1, "No input file")
 filename = sys.argv[1]
 
@@ -398,26 +425,7 @@ print "int condition = 0;"
 print "char inputbuffer[20];"
 print "int main() {\n"
 
-#variables, declaration syntax:
-#Name, value
-declarations = []
-while not beginsWithNoWhitespace(src[N], 'Act'):
-	Assert(N < len(src) - 1, "File contains no Acts")
-	#print src[N]
-	if len(trimWhitespace(src[N])) > 0:
-		#print src[N]
-		declarations.append(src[N])
-	N += 1
-
-for dec in declarations:
-	commaIndex = dec.find(',')
-	Assert(commaIndex > 0, "Improper declaration")
-	wordsInName = trimLeadingWhitespace(dec[:commaIndex]).split(" ")
-	varname = wordsInName[-1]
-	value = parseNum(dec[commaIndex:-2])
-	print "int " + str(varname) + " = " + str(value) + ";"
-	vartable.add(varname)
-
+handleDeclarations()
 scenes = []
 unfinished = False
 while N < len(src):
