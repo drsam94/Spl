@@ -1,0 +1,15 @@
+:		{ yylval.str = newstr(yytext); return COLON; }
+,		{ yylval.str = newstr(yytext); return COMMA; }
+!		{ yylval.str = newstr(yytext); return EXCLAMATION_MARK; }
+\[		{ yylval.str = newstr(yytext); return LEFT_BRACKET; }
+\.		{ yylval.str = newstr(yytext); return PERIOD; }
+\?		{ yylval.str = newstr(yytext); return QUESTION_MARK; }
+\]		{ yylval.str = newstr(yytext); return RIGHT_BRACKET; }
+
+{ROMAN_NUMBER}				{ yylval.str = newstr(yytext); return ROMAN_NUMBER; }
+"act"[[:space:]]+{ROMAN_NUMBER}		{ yylval.str = newstr(yytext); return ACT_ROMAN; }
+"scene"[[:space:]]+{ROMAN_NUMBER}	{ yylval.str = newstr(yytext); return SCENE_ROMAN; }
+
+[[:alnum:]]+	{ yylval.str = newstr(yytext); return NONMATCH; }
+[[:space:]]+	/* Eat space (like Mantrid drones) */
+.		{ yylval.str = newstr(yytext); return NONMATCH; }

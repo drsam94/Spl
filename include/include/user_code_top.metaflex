@@ -1,0 +1,12 @@
+%{
+#include <stdio.h>
+
+#include "telma.h"
+#include "grammar.tab.h"
+#include "strutils.h"
+
+%}
+
+%option yylineno
+%option case-insensitive
+

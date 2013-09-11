@@ -391,7 +391,7 @@ def handleDeclarations():
 
 	for dec in declarations:
 		commaIndex = dec.find(',')
-		Assert(commaIndex > 0, "Improper declaration")
+		Assert(commaIndex > 0, "Improper declaration " + str(declarations))
 		wordsInName = trimLeadingWhitespace(dec[:commaIndex]).split(" ")
 		varname = wordsInName[-1]
 		value = parseNum(dec[commaIndex:-2])
@@ -412,8 +412,9 @@ loadWordLists()
 #parse the title - all the text up until the first .
 #title is unimportant and is thrown out
 
-while src[N].find('.') >= 0:
+while src[N].find('.') < 0:
 	N += 1
+N += 1
 #title is thrown out
 
 print "// " + filename
