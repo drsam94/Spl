@@ -192,10 +192,10 @@ def getStatements():
 
 
 class Tree:
-    def __init__(self, v, l, r):
-    	self.value = v
-    	self.left  = l
-        self.right = r
+	def __init__(self, v, l, r):
+		self.value = v
+		self.left  = l
+		self.right = r
 
 def wordToOperator(op):
 	if op == "sum":
