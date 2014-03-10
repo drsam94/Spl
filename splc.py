@@ -6,7 +6,7 @@ This is a compiler that implements the majority of the Shakespeare programming l
 invented by Kalle Hasselstrom and Jon Aslund, I take no credit for inventing the language.
 This software is free to edit or use, and though I doubt anyone would use this for many projects,
 I guess I would appreciate some degree of acknowledgment if you do.
-(c) Sam Donow 2013
+(c) Sam Donow 2013-2014
 sad3@williams.edu
 drsam94@gmail.com"""
 #missing features
@@ -309,7 +309,7 @@ def parseStatement(stat):
         return 'fprintf(stdout, "%c", (char)' + target + ');\n'
     elif trimmed == "listentoyourheart" or trimmed == "listentothyheart":
         #numerical input
-        return 'fgets(inputbuffer, sizeof inputbuffer, stdin);\nsscanf(inputbuffer, "%d", &' + target + ');\n' #" = getchar() - '0';\n"
+        return 'fgets(inputbuffer, BUFSIZ, stdin);\nsscanf(inputbuffer, "%d", &' + target + ');\n' #" = getchar() - '0';\n"
     elif trimmed == "openyourmind" or trimmed == "openyourmind":
         #character input
         return target + " = getchar();\n"
@@ -418,12 +418,12 @@ N += 1
 #title is thrown out
 
 print "// " + filename
-print "// compiled with splc.py (c) Sam Donow 2013"
+print "// compiled with splc.py (c) Sam Donow 2013-2014"
 print "#include <stdio.h>"
 print "#include <math.h>"
 print '#include "include/mathhelpers.h"'
 print "int condition = 0;"
-print "char inputbuffer[20];"
+print "char inputbuffer[BUFSIZ];"
 print "int main() {\n"
 
 handleDeclarations()
@@ -471,5 +471,4 @@ while N < len(src):
     else:
         N += 1
 writeScenes(scenes, True)
-#print "int main() {\n\tgoto act1;\n}"#return act1();\n}"
 print "}"
