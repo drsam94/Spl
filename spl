@@ -1,4 +1,4 @@
 python2 splc.py $1 > a.out.spl.c
-if [ $? -ne 0 ]; then
+if [ $? -eq 0 ]; then
     gcc a.out.spl.c -lm
 fi
