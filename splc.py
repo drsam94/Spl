@@ -399,6 +399,11 @@ def handleDeclarations():
         Assert(varname in valid_names, "Non-Shakespearean variable name")
         vartable.add(varname)
 
+def getActOrSceneNumber(s, actOrScene):
+    num = s[s.find(actOrScene):].split(" ")[1]
+    if num.find(':') > 0:
+        num = num[:num.find(':')]
+    return parseRomanNumeral(num)
 #-------------------------------Begin Main Program-------------------------#
 Assert(len(sys.argv) > 1, "No input file")
 filename = sys.argv[1]
@@ -431,12 +436,14 @@ scenes = []
 unfinished = False
 while N < len(src):
     if beginsWithNoWhitespace(src[N], 'Act'):
+        Assert (getActOrSceneNumber(src[N], 'Act') == actnum + 1, "Illegal Act numbering")
         if actnum > 0:
             writeScenes(scenes, False)
             scenes = []
         actnum += 1
         N += 1
     elif beginsWithNoWhitespace(src[N], 'Scene'):
+        Assert (getActOrSceneNumber(src[N], 'Scene') == len(scenes) + 1, "Illegal Scene numbering")
         N += 1
         speaker = ""
         target  = ""

@@ -17,7 +17,6 @@ The following features have yet to be or may never be implemented:
 
 - Stacks (because who needs data structures in Shakespeare, really?)
 - multiple-word nouns in cases where using just the last word would generate any confusion
-- Enforcement of proper scene numberng.
 
 The following are planned features not in the original language spec that may be implemented in
 later versions of this compiler
@@ -27,7 +26,6 @@ later versions of this compiler
 - Support for word replaces of functions: If the goal of Shakespeare is to make programs look like plays, then it
   is sub-optimal having to use words like "square root" all over the place, so I may add a way to define equivalent
   words for math functions in a text file.
-- A smarter command line script with flags to name output files, etc.
 
 To use spl, simply run
 
