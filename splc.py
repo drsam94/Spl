@@ -36,7 +36,7 @@ def Assert(b, s):
     global N
     if not b:
         sys.stderr.write(s + " at line " + str(N) + "\n")
-        exit()
+        sys.exit(1)
 
 def isNoun(word):
     return word in pos_nouns or word in neg_nouns or word in zero_nouns
