@@ -6,14 +6,13 @@ This is a compiler that implements the majority of the Shakespeare programming l
 invented by Kalle Hasselstrom and Jon Aslund, I take no credit for inventing the language.
 This software is free to edit or use, and though I doubt anyone would use this for many projects,
 I guess I would appreciate some degree of acknowledgment if you do.
-(c) Sam Donow 2013-2014
+(c) V1.1 Sam Donow 2013-2014
 sad3@williams.edu
 drsam94@gmail.com"""
 #missing features
 
 #full support for multi-word nouns/names
-#other restrictions: e.g need for well-numbered scenes
-#Stacks (eh, I may never add these), who needs them?
+#Stacks, who needs them?
 
 pos_adj    = []
 neg_adj    = []
@@ -30,6 +29,8 @@ speaker    = ""
 target     = ""
 stage      = set([])
 actnum     = 0
+act_names  = {}
+scene_names= {}
 
 #report a compile-time error, then exit
 def Assert(b, s):
@@ -37,6 +38,12 @@ def Assert(b, s):
     if not b:
         sys.stderr.write(s + " at line " + str(N) + "\n")
         sys.exit(1)
+
+#Abstraction for writing to file, eased python 2/3 agnosticity,
+#and will eventually allow file output instead of stdout if that
+#ever is desired
+def writeToFile(s):
+    sys.stdout.write(str(s) + "\n")
 
 def isNoun(word):
     return word in pos_nouns or word in neg_nouns or word in zero_nouns
@@ -187,7 +194,6 @@ def getStatements():
     for stat in statements:
         if len(trimWhitespace(stat)) > 0:
             retval.append(stat)
-    #print retval
     return retval
 
 
@@ -283,6 +289,12 @@ def parseExpr(expr):
     tree = buildExpressionTree(expr.split(" "))[0]
     return TreeToString(tree)
 
+def concatWords(wordArray):
+    c = ""
+    for word in wordArray:
+        c += word
+    return c
+
 def firstWord(statment):
     words = statement.split(" ")
     for word in words:
@@ -354,22 +366,30 @@ def parseStatement(stat):
         words = statement.split(" ")
         nextTwo = words[2] + " " + words[3]
         Assert (nextTwo == "return to" or nextTwo == "proceed to", "Ill-formed goto")
-        Assert (words[4] == "scene" or words[4] == "act", "Ill-formed goto")
-        typeword = words[4] if words[4] == "act" else ("act_" + str(actnum) + "_scene")
-        return "goto " + typeword + str(parseRomanNumeral(words[5])) + ";\n"
+        # classic goto with scene or act
+        if words[4] == "scene" or words[4] == "act":
+            typeword = words[4] if words[4] == "act" else ("act_" + str(actnum) + "_scene")
+            return "goto " + typeword + str(parseRomanNumeral(words[5])) + ";\n"
+        else:
+            restOfPhrase = concatWords(words[4:])
+            type_ = "scene" if restOfPhrase in scene_names.keys() else "act" if restOfPhrase in act_names.keys() else "none"
+            Assert (type_ != "none", "Goto refers to nonexistant act or scene")
+            nameDict = act_names if type_ == "act" else scene_names
+            typeword = act if type_ == "act" else ("act_" + str(actnum) + "_scene")
+            return "goto " + typeword + str(nameDict[restOfPhrase]) + ";\n"
     else:
         return ""
 
 def writeScenes(scenes, isLast):
-    print "act" + str(actnum) + ": {\ngoto act_" + str(actnum) + "_scene1;\n}"
+    writeToFile("act" + str(actnum) + ": {\ngoto act_" + str(actnum) + "_scene1;\n}")
     for j in range(0, len(scenes)):
-        print "act_" + str(actnum) + "_scene" + str(j + 1) + ": {"
-        print scenes[j]
+        writeToFile("act_" + str(actnum) + "_scene" + str(j + 1) + ": {")
+        writeToFile(scenes[j])
         if j < len(scenes) - 1:
-            print "goto act_" + str(actnum) + "_scene" + str(j + 2) + ";\n"
+            writeToFile("goto act_" + str(actnum) + "_scene" + str(j + 2) + ";\n")
         elif not isLast:
-            print "goto act" + str(actnum + 1) + ";\n"
-        print "}"
+            writeToFile("goto act" + str(actnum + 1) + ";\n")
+        writeToFile("}")
     
 def handleDeclarations():
     global N
@@ -381,7 +401,6 @@ def handleDeclarations():
     while not beginsWithNoWhitespace(src[N], 'Act'):
         Assert(N < len(src) - 1, "File contains no Acts")
         if len(trimWhitespace(src[N])) > 0:
-            #print src[N]
             if not unfinished:
                 declarations.append(src[N])
             else:
@@ -395,7 +414,7 @@ def handleDeclarations():
         wordsInName = trimLeadingWhitespace(dec[:commaIndex]).split(" ")
         varname = wordsInName[-1]
         value = parseNum(dec[commaIndex:-2])
-        print "int " + str(varname) + " = " + str(value) + ";"
+        writeToFile("int " + str(varname) + " = " + str(value) + ";")
         Assert(varname in valid_names, "Non-Shakespearean variable name")
         vartable.add(varname)
 
@@ -403,7 +422,16 @@ def getActOrSceneNumber(s, actOrScene):
     num = s[s.find(actOrScene):].split(" ")[1]
     if num.find(':') > 0:
         num = num[:num.find(':')]
+    else:
+        Assert (False, "Bad " + actOrScene + " heading")
     return parseRomanNumeral(num)
+
+def getActOrSceneDescription(s):
+    desc = trimWhitespace(s[s.find(':')+1:]).lower()
+    p = findPunctuation(desc)
+    if p > 0:
+        desc = desc[:p]
+    return desc
 #-------------------------------Begin Main Program-------------------------#
 Assert(len(sys.argv) > 1, "No input file")
 filename = sys.argv[1]
@@ -422,14 +450,14 @@ while src[N].find('.') < 0:
 N += 1
 #title is thrown out
 
-print "// " + filename
-print "// compiled with splc.py (c) Sam Donow 2013-2014"
-print "#include <stdio.h>"
-print "#include <math.h>"
-print '#include "include/mathhelpers.h"'
-print "int condition = 0;"
-print "char inputbuffer[BUFSIZ];"
-print "int main() {\n"
+writeToFile("// " + filename + "\n" + 
+"// compiled with splc.py (c) Sam Donow 2013-2014\n" + 
+"#include <stdio.h>\n" + 
+"#include <math.h>\n" + 
+'#include "include/mathhelpers.h"\n' +  
+"int condition = 0;\n" + 
+"char inputbuffer[BUFSIZ];\n" + 
+"int main() {\n")
 
 handleDeclarations()
 scenes = []
@@ -440,10 +468,13 @@ while N < len(src):
         if actnum > 0:
             writeScenes(scenes, False)
             scenes = []
+            scene_names = {}
         actnum += 1
+        act_names[getActOrSceneDescription(src[N])] = actnum
         N += 1
     elif beginsWithNoWhitespace(src[N], 'Scene'):
         Assert (getActOrSceneNumber(src[N], 'Scene') == len(scenes) + 1, "Illegal Scene numbering")
+        scene_names[getActOrSceneDescription(src[N])] = len(scenes) + 1
         N += 1
         speaker = ""
         target  = ""
@@ -478,4 +509,4 @@ while N < len(src):
     else:
         N += 1
 writeScenes(scenes, True)
-print "}"
+writeToFile("}")

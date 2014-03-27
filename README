@@ -1,7 +1,7 @@
 Spl
 ===
 
- Shakespeare Compiler written in Python, splc.py
+Shakespeare Compiler written in Python, splc.py
 This is a compiler from SPL to C that implements the majority of the Shakespeare programming
 language invented by Kalle Hasselstrom and Jon Aslund, I take no credit for inventing the language.
 This software is free to edit or use, and though I doubt anyone would use this for many projects,
@@ -18,11 +18,24 @@ The following features have yet to be or may never be implemented:
 - Stacks (because who needs data structures in Shakespeare, really?)
 - multiple-word nouns in cases where using just the last word would generate any confusion
 
+The following feature not in the original language spec is implemented but is a work in progress:
+
+In the original language spec, goto statements take the form "let us proceed to scene III", "let us return to act I",
+etc. As this is both awkward and non-Shakesperian, I have made it so that you can use the name of an act or scene (not case,
+punctuation, or whitespace sensitive) in place of a this awkward structure. Therefore, if you had
+Act I: The Forest.
+
+Then the sentence "let us return to the forest" is equivalent to "let us return to act I".
+
+This feature, though implemented, is not yet perfect: you can only use it to return to previous acts or scenes 
+(or the act/scene you are currently in). Therefore, you cannot use this to jump to scene III from scene II.
+Also, like standard gotos, you can not jump to a scene within an act other than the one you are currently in.
+
+I will look into allowing future gotos in this structure, but it works well for past gotos.
+
 The following are planned features not in the original language spec that may be implemented in
 later versions of this compiler
 
-- Support for act/scene names in goto statements, so that one can write "let us return to the talk in the forest"
-  instead of "let us return to scene II" for instance.
 - Support for word replaces of functions: If the goal of Shakespeare is to make programs look like plays, then it
   is sub-optimal having to use words like "square root" all over the place, so I may add a way to define equivalent
   words for math functions in a text file.
@@ -39,8 +52,8 @@ $ gcc [Output File] -lm
 $ ./a.out
 
 The spl script should work in any bash terminal, on Windows, the explicit python method should work if you have
-all of the right programs installed (other than ./a.out, I think on windows you would just type a.out)
+all of the right programs installed. I may at some time get around to writing a .bat script for Windows users.
 
 Depenencies:
-Python 2.X
+Python (2.X or 3.X)
 gcc
