@@ -30,7 +30,7 @@ target     = ""
 stage      = set([])
 actnum     = 0
 act_names  = {}
-scene_names= {}
+scene_names= []
 
 #report a compile-time error, then exit
 def Assert(b, s):
@@ -372,9 +372,10 @@ def parseStatement(stat):
             return "goto " + typeword + str(parseRomanNumeral(words[5])) + ";\n"
         else:
             restOfPhrase = concatWords(words[4:])
-            type_ = "scene" if restOfPhrase in scene_names.keys() else "act" if restOfPhrase in act_names.keys() else "none"
+            type_ = "scene" if restOfPhrase in scene_names[actnum].keys() \
+            else "act" if restOfPhrase in act_names.keys() else "none"
             Assert (type_ != "none", "Goto refers to nonexistant act or scene")
-            nameDict = act_names if type_ == "act" else scene_names
+            nameDict = act_names if type_ == "act" else scene_names[actnum]
             typeword = act if type_ == "act" else ("act_" + str(actnum) + "_scene")
             return "goto " + typeword + str(nameDict[restOfPhrase]) + ";\n"
     else:
@@ -432,6 +433,27 @@ def getActOrSceneDescription(s):
     if p > 0:
         desc = desc[:p]
     return desc
+
+# Gets all the names of scenes and acts, and adds them to the respective tables
+# This must be done in a preprocessing step, in order to enable gotos to future acts/scenes
+def parseAllActAndSceneDescriptions():
+    global scene_names
+    global act_names
+    current_act = 0
+    current_scene = 0
+    scene_names = [{}]
+    for line in src:
+        if beginsWithNoWhitespace(line, "Act"):
+            desc = getActOrSceneDescription(line)
+            current_act += 1
+            act_names[desc] = current_act
+            scene_names.append(dict())
+            current_scene = 0
+        elif beginsWithNoWhitespace(line, "Scene"):
+            desc = getActOrSceneDescription(line)
+            current_scene += 1
+            scene_names[current_act][desc] = current_scene
+
 #-------------------------------Begin Main Program-------------------------#
 Assert(len(sys.argv) > 1, "No input file")
 filename = sys.argv[1]
@@ -460,6 +482,8 @@ writeToFile("// " + filename + "\n" +
 "int main() {\n")
 
 handleDeclarations()
+parseAllActAndSceneDescriptions()
+
 scenes = []
 unfinished = False
 while N < len(src):
@@ -468,13 +492,12 @@ while N < len(src):
         if actnum > 0:
             writeScenes(scenes, False)
             scenes = []
-            scene_names = {}
         actnum += 1
-        act_names[getActOrSceneDescription(src[N])] = actnum
+        #act_names[getActOrSceneDescription(src[N])] = actnum
         N += 1
     elif beginsWithNoWhitespace(src[N], 'Scene'):
         Assert (getActOrSceneNumber(src[N], 'Scene') == len(scenes) + 1, "Illegal Scene numbering")
-        scene_names[getActOrSceneDescription(src[N])] = len(scenes) + 1
+        #scene_names[getActOrSceneDescription(src[N])] = len(scenes) + 1
         N += 1
         speaker = ""
         target  = ""
