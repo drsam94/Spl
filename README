@@ -27,11 +27,7 @@ Act I: The Forest.
 
 Then the sentence "let us return to the forest" is equivalent to "let us return to act I".
 
-This feature, though implemented, is not yet perfect: you can only use it to return to previous acts or scenes 
-(or the act/scene you are currently in). Therefore, you cannot use this to jump to scene III from scene II.
-Also, like standard gotos, you can not jump to a scene within an act other than the one you are currently in.
-
-I will look into allowing future gotos in this structure, but it works well for past gotos.
+Like standard gotos, you can not jump to a scene within an act other than the one you are currently in.
 
 The following are planned features not in the original language spec that may be implemented in
 later versions of this compiler
