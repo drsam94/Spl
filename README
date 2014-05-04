@@ -6,7 +6,7 @@ This is a compiler from SPL to C that implements the majority of the Shakespeare
 language invented by Kalle Hasselstrom and Jon Aslund, I take no credit for inventing the language.
 This software is free to edit or use, and though I doubt anyone would use this for many projects,
 I guess I would appreciate some degree of acknowledgment if you do.
-(c) Sam Donow 2013
+(c) Sam Donow 2014
 sad3@williams.edu
 drsam94@gmail.com.
 
