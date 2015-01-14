@@ -4,9 +4,9 @@ Spl
 Shakespeare Compiler written in Python, splc.py
 This is a compiler from SPL to C that implements the majority of the Shakespeare programming
 language invented by Kalle Hasselstrom and Jon Aslund, I take no credit for inventing the language.
-This software is free to edit or use, and though I doubt anyone would use this for many projects,
-I guess I would appreciate some degree of acknowledgment if you do.
-(c) Sam Donow 2014
+This software is free to edit, use, or sell, but I wouldn't mind if you attached the following
+copyright notice to any work that utilizes this project
+(c) Sam Donow 2014-2015
 sad3@williams.edu
 drsam94@gmail.com.
 
