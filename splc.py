@@ -6,7 +6,7 @@ This is a compiler that implements the majority of the Shakespeare programming l
 invented by Kalle Hasselstrom and Jon Aslund, I take no credit for inventing the language.
 This software is free to edit or use, and though I doubt anyone would use this for many projects,
 I guess I would appreciate some degree of acknowledgment if you do.
-(c) V1.1 Sam Donow 2013-2014
+(c) V1.2 Sam Donow 2013-2014
 sad3@williams.edu
 drsam94@gmail.com"""
 #missing features
@@ -82,7 +82,7 @@ def beginsWithNoWhitespace(s, pattern):
     return beginsWith(trimWhitespace(s), pattern)
 
 def beginsWith(s, pattern):
-    return s[:len(pattern)] == pattern 
+    return s[:len(pattern)] == pattern
 
 def loadFileIntoList(filename, list):
     f = open(filename, 'r')
@@ -104,7 +104,7 @@ def loadWordLists():
 
 roman_values = { 'M': 1000, 'D': 500, 'C': 1000, 'L': 50, 'X': 10, 'V': 5, 'I': 1 }
 def parseRomanNumeral(roman_string):
-    roman_string = roman_string.upper() 
+    roman_string = roman_string.upper()
     strindex = 0
     roman_sum = 0
     while strindex < len(roman_string) - 1:
@@ -122,15 +122,21 @@ def isNumber(s):
             return True
     return False
 
+
+
 #parse a string that is supposed to evaluate to a number
-def parseNum(s):
+#if failOk is set to true, will return 0 for phrases that do not evaluate to a number
+def parseNum(s, failOk = False):
     words = s.split(" ")
     nounIndex = len(words)
     for i in range(0,len(words)):
         if isNoun(words[i]):
             nounIndex = i
             break
-    Assert (nounIndex < len(words), str(words) + "\nExpected a number, but found no noun")
+    ok = nounIndex < len(words)
+    if not ok and failOk:
+        return 0
+    Assert (ok, str(words) + "\nExpected a number, but found no noun")
     value = nounValue(words[nounIndex])
     for word in words[:nounIndex]:
         if isAdjective(word):
@@ -179,7 +185,7 @@ def getStatements():
         if punctuation < 0:
             if unfinished == False:
                 statements.append(line[:-1])
-            else: 
+            else:
                 statements[-1] += line[:-1]
             N += 1
             line = src[N]
@@ -391,7 +397,7 @@ def writeScenes(scenes, isLast):
         elif not isLast:
             writeToFile("goto act" + str(actnum + 1) + ";\n")
         writeToFile("}")
-    
+
 def handleDeclarations():
     global N
     global src
@@ -414,7 +420,7 @@ def handleDeclarations():
         Assert(commaIndex > 0, "Improper declaration " + str(declarations))
         wordsInName = trimLeadingWhitespace(dec[:commaIndex]).split(" ")
         varname = wordsInName[-1]
-        value = parseNum(dec[commaIndex:-2])
+        value = parseNum(dec[commaIndex:-2], True)
         writeToFile("int " + str(varname) + " = " + str(value) + ";")
         Assert(varname in valid_names, "Non-Shakespearean variable name")
         vartable.add(varname)
@@ -472,13 +478,13 @@ while src[N].find('.') < 0:
 N += 1
 #title is thrown out
 
-writeToFile("// " + filename + "\n" + 
-"// compiled with splc.py (c) Sam Donow 2013-2014\n" + 
-"#include <stdio.h>\n" + 
-"#include <math.h>\n" + 
-'#include "include/mathhelpers.h"\n' +  
-"int condition = 0;\n" + 
-"char inputbuffer[BUFSIZ];\n" + 
+writeToFile("// " + filename + "\n" +
+"// compiled with splc.py (c) Sam Donow 2013-2015\n" +
+"#include <stdio.h>\n" +
+"#include <math.h>\n" +
+'#include "include/mathhelpers.h"\n' +
+"int condition = 0;\n" +
+"char inputbuffer[BUFSIZ];\n" +
 "int main() {\n")
 
 handleDeclarations()

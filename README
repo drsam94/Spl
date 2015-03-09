@@ -18,7 +18,9 @@ The following features have yet to be or may never be implemented:
 - Stacks (because who needs data structures in Shakespeare, really?)
 - multiple-word nouns in cases where using just the last word would generate any confusion
 
-The following feature not in the original language spec is implemented but is a work in progress:
+The following features not in the original language spec is implemented but is a work in progress:
+
+PRETTY GOTOS:
 
 In the original language spec, goto statements take the form "let us proceed to scene III", "let us return to act I",
 etc. As this is both awkward and non-Shakesperian, I have made it so that you can use the name of an act or scene (not case,
@@ -28,6 +30,20 @@ Act I: The Forest.
 Then the sentence "let us return to the forest" is equivalent to "let us return to act I".
 
 Like standard gotos, you can not jump to a scene within an act other than the one you are currently in.
+
+INITIAL DECLARATIONS:
+
+In the original language, everything after the comma in a declaration, such as:
+
+Romeo, an evil octopus.
+
+is ignored: so in the above, though octopus is not a Shakespearean noun, this is allowed. However, the spec does not make it clear what the initial value of a variable should be, which would lead to undefined behavior. In SPL, you can put a noun phrase after Romeo, and it will be evaluated to a number, so for example
+
+Romeo, a good man.
+
+will assign 2 to Romeo. Any non-legal noun phrase will assign 0 instead (as though it had been ignored).
+
+----------
 
 The following are planned features not in the original language spec that may be implemented in
 later versions of this compiler
