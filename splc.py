@@ -1,14 +1,16 @@
 import sys
 import math
 
-"""A Shakespeare Compiler written in Python, splc.py
+"""
+A Shakespeare Compiler written in Python, splc.py
 This is a compiler that implements the majority of the Shakespeare programming language
 invented by Kalle Hasselstrom and Jon Aslund, I take no credit for inventing the language.
-This software is free to edit or use, and though I doubt anyone would use this for many projects,
-I guess I would appreciate some degree of acknowledgment if you do.
-(c) V1.2 Sam Donow 2013-2014
+This software is relased into the public domain
+(c) V1.2 Sam Donow 2013-2015
 sad3@williams.edu
-drsam94@gmail.com"""
+drsam94@gmail.com
+"""
+
 #missing features
 
 #full support for multi-word nouns/names
@@ -314,8 +316,8 @@ def parseStatement(stat):
     if first in ["you", "thou"]:
         #this is an assignment of the form Prounoun [as adj as] expression
         expr = ""
-        if statement.rfind("as") >= 0:
-            expr = statement[statement.rfind("as") + 3:]
+        if statement.rfind(" as ") >= 0:
+            expr = statement[statement.rfind(" as ") + 5:]
         else:
             expr = statement[len(first) + 1:]
         return target + " = " + parseExpr(expr) + " ;\n"

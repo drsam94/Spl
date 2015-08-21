@@ -59,7 +59,7 @@ $ ./a.out
 
 Or, if you would like, you can run
 
-$ python2 splc.py [Input File] > [Output File]
+$ python splc.py [Input File] > [Output File]
 $ gcc [Output File] -lm
 $ ./a.out
 
