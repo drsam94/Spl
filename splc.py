@@ -317,7 +317,7 @@ def parseStatement(stat):
         #this is an assignment of the form Prounoun [as adj as] expression
         expr = ""
         if statement.rfind(" as ") >= 0:
-            expr = statement[statement.rfind(" as ") + 5:]
+            expr = statement[statement.rfind(" as ") + 4:]
         else:
             expr = statement[len(first) + 1:]
         return target + " = " + parseExpr(expr) + " ;\n"
