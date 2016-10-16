@@ -23,7 +23,7 @@ The following features have yet to be or may never be implemented:
 
 The following features not in the original language spec is implemented but is a work in progress:
 
-PRETTY GOTOS:
+#### Pretty Gotos
 
 In the original language spec, goto statements take the form `let us proceed to scene III`, `let us return to act I`,
 etc. As this is both awkward and non-Shakesperian, I have made it so that you can use the name of an act or scene (not case,
