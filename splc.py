@@ -1,5 +1,8 @@
+#!/usr/bin/python
+
 import sys
 import math
+import re
 
 """
 A Shakespeare Compiler written in Python, splc.py
@@ -101,7 +104,7 @@ def loadWordLists():
     loadFileIntoList("include/neutral_noun.wordlist" , pos_nouns)
     loadFileIntoList("include/negative_noun.wordlist", neg_nouns)
     loadFileIntoList("include/positive_comparative.wordlist", pos_comp)
-    loadFileIntoList("include/positive_comparative.wordlist", neg_comp)
+    loadFileIntoList("include/negative_comparative.wordlist", neg_comp)
     loadFileIntoList("include/character.wordlist", valid_names)
 
 roman_values = { 'M': 1000, 'D': 500, 'C': 1000, 'L': 50, 'X': 10, 'V': 5, 'I': 1 }
@@ -258,14 +261,14 @@ def buildExpressionTree(expr):
         while expr[i] not in binop and expr[i] not in unop and expr[i] not in ["and", "remainder"]:
             if expr[i] in ["you", "thee", "yourself", "thyself", "thou"]:
                 expr = expr[i + 1:]
-                return Tree(target, "", ""), expr
+                return Tree(target+".value", "", ""), expr
             elif expr[i] in ["me", "myself", "i"]:
                 expr = expr[i + 1:]
-                return Tree(speaker, "", ""), expr
+                return Tree(speaker+".value", "", ""), expr
             elif expr[i].capitalize() in vartable:
                 name = expr[i]
                 expr = expr[i + 1:]
-                return Tree(name.capitalize(), "", ""), expr
+                return Tree(name.capitalize()+".value", "", ""), expr
             elif i == len(expr) - 1:
                 numstr += expr[i]
                 i = len(expr)
@@ -320,19 +323,26 @@ def parseStatement(stat):
             expr = statement[statement.rfind(" as ") + 4:]
         else:
             expr = statement[len(first) + 1:]
-        return target + " = " + parseExpr(expr) + " ;\n"
+        return target + ".value = " + parseExpr(expr) + " ;\n"
+    elif first in ['remember']:
+        #push onto stack
+        expr = statement[len(first) + 1:]
+        return "push(&" + target + ", " + parseExpr(expr) + ") ;\n"
+    elif first in ['recall']:
+        #pop from stack
+        return "pop(&" + target + ") ;\n"
     elif trimmed == "openyourheart" or trimmed == "openthyheart":
         #numerical output
-        return 'fprintf(stdout, "%d", ' + target + ');\n'
+        return 'fprintf(stdout, "%d", ' + target + '.value);\n'
     elif trimmed == "speakyourmind" or trimmed == "speakthymind":
         #character output
-        return 'fprintf(stdout, "%c", (char)' + target + ');\n'
+        return 'fprintf(stdout, "%c", (char)(' + target + '.value));\n'
     elif trimmed == "listentoyourheart" or trimmed == "listentothyheart":
         #numerical input
-        return 'fgets(inputbuffer, BUFSIZ, stdin);\nsscanf(inputbuffer, "%d", &' + target + ');\n' #" = getchar() - '0';\n"
+        return 'fgets(inputbuffer, BUFSIZ, stdin);\nsscanf(inputbuffer, "%d", &(' + target + '.value));\n' #" = getchar() - '0';\n"
     elif trimmed == "openyourmind" or trimmed == "openyourmind":
         #character input
-        return target + " = getchar();\n"
+        return target + ".value = getchar();\n"
     elif first in ["am", "are", "art", "be", "is"]:
         #questions - do not yet support "not"
         left  = ""
@@ -340,7 +350,7 @@ def parseStatement(stat):
         right = ""
         if statement.find("as") >= 0:
             left, kind, right = statement.split(" as ")
-            Assert(isAdjective(kind), "Ill-formed conditional in " + statement)
+            Assert(isAdjective(kind), "Ill-formed conditional (at Py:350) in " + statement)
             kind = "equal"
         elif statement.find("more") >= 0:
             words = statement.split(" ")
@@ -349,7 +359,7 @@ def parseStatement(stat):
                 if words[i] == "more":
                     moreloc = i
                     break
-            Assert(isAdjective(words[moreloc + 1]), "Ill-formed conditional in " + statement)
+            Assert(isAdjective(words[moreloc + 1]), "Ill-formed conditional (at Py:359) in " + statement)
             kind = "greater" if words[moreloc + 1] in pos_adj else "lesser"
             left, right = statement.split(" more " + words[moreloc + 1] + " ")
         else:
@@ -358,7 +368,7 @@ def parseStatement(stat):
                 if isComparative(word):
                     comp = word
                     break
-            Assert(len(comp) > 0, "Ill-formed conditional in " + statement)
+            Assert(len(comp) > 0, "Ill-formed conditional (at Py:368) in " + statement)
             kind = "greater" if comp in pos_comp else "lesser"
             left, right = statement.split(comp)
         return "condition = (" + parseExpr(left) + ") " + (">" if kind == "greater" else "<" if kind == "lesser" else "==") + " (" + parseExpr(right) + ");\n"
@@ -416,6 +426,8 @@ def handleDeclarations():
                 declarations[-1] += src[N]
             unfinished = src[N].find('.') < 0
         N += 1
+    
+              
 
     for dec in declarations:
         commaIndex = dec.find(',')
@@ -423,7 +435,7 @@ def handleDeclarations():
         wordsInName = trimLeadingWhitespace(dec[:commaIndex]).split(" ")
         varname = wordsInName[-1]
         value = parseNum(dec[commaIndex:-2], True)
-        writeToFile("int " + str(varname) + " = " + str(value) + ";")
+        writeToFile("CHARACTER " + str(varname) + " = InitializeCharacter(" + str(value) + ",\"" + str(varname) + "\");")
         Assert(varname in valid_names, "Non-Shakespearean variable name")
         vartable.add(varname)
 
@@ -470,6 +482,9 @@ f = open(filename, 'r')
 src = f.readlines()
 f.close()
 
+for index,line in enumerate(src):         #replace tab characters with spaces so the parser doesn't choke on them
+    src[index] = re.sub('\t','    ',line)
+
 loadWordLists()
 
 #parse the title - all the text up until the first .
@@ -484,11 +499,12 @@ writeToFile("// " + filename + "\n" +
 "// compiled with splc.py (c) Sam Donow 2013-2015\n" +
 "#include <stdio.h>\n" +
 "#include <math.h>\n" +
-'#include "include/mathhelpers.h"\n' +
+'#include "include/mathhelpers.h"\n' + 
+'#include "include/stack.h"\n' +
 "int condition = 0;\n" +
 "char inputbuffer[BUFSIZ];\n" +
-"int main() {\n")
-
+"int main() {\n")                           
+                           
 handleDeclarations()
 parseAllActAndSceneDescriptions()
 
