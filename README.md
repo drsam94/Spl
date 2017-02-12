@@ -18,7 +18,6 @@ http://shakespearelang.sourceforge.net/report/shakespeare/
 
 The following features have yet to be or may never be implemented:
 
-- Stacks (because who needs data structures in Shakespeare, really?)
 - multiple-word nouns in cases where using just the last word would generate any confusion
 
 The following features not in the original language spec is implemented but is a work in progress:
