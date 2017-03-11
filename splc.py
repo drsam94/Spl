@@ -331,6 +331,9 @@ def parseStatement(stat):
     elif first in ['recall']:
         #pop from stack
         return "pop(&" + target + ") ;\n"
+    elif first in ['forget']:
+        #dump stack
+        return target + ".top = -1 ;\n"
     elif trimmed == "openyourheart" or trimmed == "openthyheart":
         #numerical output
         return 'fprintf(stdout, "%d", ' + target + '.value);\n'
@@ -349,7 +352,11 @@ def parseStatement(stat):
         kind  = ""
         right = ""
         if statement.find("as") >= 0:
-            left, kind, right = statement.split(" as ")
+            try:
+                left, kind, right = statement.split(" as ")
+            except Exception as e:
+                sys.stderr.write("Ill-formed statement at Py:356 in {}: {}".format(statement,e))
+                sys.exit(1)
             Assert(isAdjective(kind), "Ill-formed conditional (at Py:350) in " + statement)
             kind = "equal"
         elif statement.find("more") >= 0:
@@ -394,7 +401,7 @@ def parseStatement(stat):
             else "act" if restOfPhrase in act_names.keys() else "none"
             Assert (type_ != "none", "Goto refers to nonexistant act or scene")
             nameDict = act_names if type_ == "act" else scene_names[actnum]
-            typeword = act if type_ == "act" else ("act_" + str(actnum) + "_scene")
+            typeword = "act" if type_ == "act" else ("act_" + str(actnum) + "_scene")
             return "goto " + typeword + str(nameDict[restOfPhrase]) + ";\n"
     else:
         return ""
