@@ -346,6 +346,16 @@ def parseStatement(stat):
     elif trimmed == "openyourmind" or trimmed == "openyourmind":
         #character input
         return target + ".value = getchar();\n"
+    elif trimmed == "thedieiscast" or trimmed == "aleaiactaest":
+        #random number generator seed, no character specified: Caesar    
+        return "srand(Caesar.value);\n"
+    elif beginsWith(statement, "the die is cast by"):
+        #random number generator seed, character specified
+        location = statement.find("the die is cast by")
+        return "srand(" + parseStatement(statement[location + 19:]) + " );\n"
+    elif beginsWith(statement, "let fortune") or beginsWith(statement, "let fate"):
+        #random number
+        return target + ".value = rand();\n"
     elif first in ["am", "are", "art", "be", "is"]:
         #questions - do not yet support "not"
         left  = ""
@@ -505,12 +515,15 @@ N += 1
 writeToFile("// " + filename + "\n" +
 "// compiled with splc.py (c) Sam Donow 2013-2015\n" +
 "#include <stdio.h>\n" +
+"#include <stdlib.h>\n" +
+"#include <time.h>\n" +
 "#include <math.h>\n" +
 '#include "include/mathhelpers.h"\n' + 
 '#include "include/stack.h"\n' +
 "int condition = 0;\n" +
 "char inputbuffer[BUFSIZ];\n" +
-"int main() {\n")                           
+"int main() {\n"+
+'srand(time(NULL));\n')                           
                            
 handleDeclarations()
 parseAllActAndSceneDescriptions()
