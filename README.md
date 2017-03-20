@@ -45,6 +45,10 @@ is ignored: so in the above, though octopus is not a Shakespearean noun, this is
 
 will assign 2 to Romeo. Any non-legal noun phrase will assign 0 instead (as though it had been ignored).
 
+### Pseudo-random integer generation
+
+The original SPL specification does not include any keyword to allow generation of random numbers. This compiler supports keywords to allow random integer generation, by beginning a sentence with "let fate" or "let fortune", e.g. "Let fortune decide your future!". The text after the keyword is ignored. By default the RNG is seeded with the time, but to manually seed the RNG, use the statements "The die is cast by ()", which seeds the RNG based on the remainder of the sentence (e.g. "The die is cast by Romeo" seeds the RNG based on Romeo's value. Alternatively, you can use "Alea iacta est." which seeds the RNG based on Julius Caesar's value.
+
 ----------
 
 The following are planned features not in the original language spec that may be implemented in
