@@ -1,12 +1,12 @@
 #include <string.h>
-#define MAXSIZE 1024
+#define MAXSIZE 1130250
 #define MAXNAMELENGTH 100
 
 
 struct character
 {
-   int stk[MAXSIZE];
-   int top;
+   int* stk;
+   long top;
    int value;
    char name[MAXNAMELENGTH];
 };
@@ -18,11 +18,13 @@ void push(CHARACTER *s, int num)
 {
    if ((*s).top >= (MAXSIZE - 1))
    {
-       char errormessage[MAXNAMELENGTH+50];
+       char errormessage[MAXNAMELENGTH+500];
        strcpy(errormessage, "Error: ");
        strlcat(errormessage, (*s).name, MAXNAMELENGTH);
        strcat(errormessage, " knows too much!\n");
        printf (errormessage);
+       printf("Length: ");
+       printf("%i\n",(*s).top);
        return;
    }
    else
@@ -42,6 +44,8 @@ void pop(CHARACTER *s)
        strlcat(errormessage, (*s).name, MAXNAMELENGTH);
        strcat(errormessage, " knows nothing!\n");
        printf (errormessage);
+       printf("Length: ");
+       printf("%i\n",(*s).top);
        return;
     }
     else
@@ -55,6 +59,7 @@ void pop(CHARACTER *s)
 CHARACTER InitializeCharacter(int startingvalue, char* name)
 {
     CHARACTER MyChar;
+    MyChar.stk = malloc(MAXSIZE);
     MyChar.top = -1;
     MyChar.value = startingvalue;
     strncpy(MyChar.name,name,MAXNAMELENGTH);
