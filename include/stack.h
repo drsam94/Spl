@@ -1,11 +1,12 @@
 #include <string.h>
-#define MAXSIZE 1130250
+#define MAXSIZE 100
 #define MAXNAMELENGTH 100
 
 
 struct character
 {
    int* stk;
+   long stksize;
    long top;
    int value;
    char name[MAXNAMELENGTH];
@@ -16,22 +17,25 @@ void pop(CHARACTER *s);
 
 void push(CHARACTER *s, int num)
 {
-   if ((*s).top >= (MAXSIZE - 1))
+   if ((*s).top >= ((*s).stksize - 1))
    {
-       char errormessage[MAXNAMELENGTH+500];
-       strcpy(errormessage, "Error: ");
-       strlcat(errormessage, (*s).name, MAXNAMELENGTH);
-       strcat(errormessage, " knows too much!\n");
-       printf (errormessage);
-       printf("Length: ");
-       printf("%i\n",(*s).top);
-       return;
+       (*s).stksize += MAXSIZE;
+       int* ptr = realloc((*s).stk,(*s).stksize*sizeof(int));
+       
+       if (ptr == NULL)
+       {
+           char errormessage[MAXNAMELENGTH+500];
+           strcpy(errormessage, "Error: ");
+           strlcat(errormessage, (*s).name, MAXNAMELENGTH);
+           strcat(errormessage, " knows too much!\n");
+           printf(errormessage);
+           return;
+       }
+       (*s).stk = ptr;
    }
-   else
-   {
-     (*s).top = (*s).top + 1;
-     (*s).stk[(*s).top] = num;
-   }
+
+   (*s).top = (*s).top + 1;
+   (*s).stk[(*s).top] = num;
    return;
 }
 
@@ -45,7 +49,7 @@ void pop(CHARACTER *s)
        strcat(errormessage, " knows nothing!\n");
        printf (errormessage);
        printf("Length: ");
-       printf("%i\n",(*s).top);
+       printf("%li\n",(*s).top);
        return;
     }
     else
@@ -59,7 +63,8 @@ void pop(CHARACTER *s)
 CHARACTER InitializeCharacter(int startingvalue, char* name)
 {
     CHARACTER MyChar;
-    MyChar.stk = malloc(MAXSIZE);
+    MyChar.stk = malloc(MAXSIZE*sizeof(int));
+    MyChar.stksize=MAXSIZE;
     MyChar.top = -1;
     MyChar.value = startingvalue;
     strncpy(MyChar.name,name,MAXNAMELENGTH);
