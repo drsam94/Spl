@@ -107,7 +107,7 @@ def loadWordLists():
     loadFileIntoList("include/negative_comparative.wordlist", neg_comp)
     loadFileIntoList("include/character.wordlist", valid_names)
 
-roman_values = { 'M': 1000, 'D': 500, 'C': 1000, 'L': 50, 'X': 10, 'V': 5, 'I': 1 }
+roman_values = { 'M': 1000, 'D': 500, 'C': 100, 'L': 50, 'X': 10, 'V': 5, 'I': 1 }
 def parseRomanNumeral(roman_string):
     roman_string = roman_string.upper()
     strindex = 0
