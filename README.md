@@ -76,6 +76,6 @@ Not sure why that's needed, but if it's not there you'll get an error from the u
 The spl script should work in any bash terminal, on Windows, the explicit python method should work if you have
 all of the right programs installed. I may at some time get around to writing a .bat script for Windows users.
 
-Depenencies:
+Dependencies:
 - Python (2.X or 3.X)
 - gcc
