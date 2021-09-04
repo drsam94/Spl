@@ -18,7 +18,6 @@ http://shakespearelang.sourceforge.net/report/shakespeare/
 
 The following features have yet to be or may never be implemented:
 
-- Stacks (because who needs data structures in Shakespeare, really?)
 - multiple-word nouns in cases where using just the last word would generate any confusion
 
 The following features not in the original language spec is implemented but is a work in progress:
@@ -46,6 +45,10 @@ is ignored: so in the above, though octopus is not a Shakespearean noun, this is
 
 will assign 2 to Romeo. Any non-legal noun phrase will assign 0 instead (as though it had been ignored).
 
+### Pseudo-random integer generation
+
+The original SPL specification does not include any keyword to allow generation of random numbers. This compiler supports keywords to allow random integer generation, by beginning a sentence with "let fate" or "let fortune", e.g. "Let fortune decide your future!". The text after the keyword is ignored. By default the RNG is seeded with the time, but to manually seed the RNG, use the statements "The die is cast by ()", which seeds the RNG based on the remainder of the sentence (e.g. "The die is cast by Romeo" seeds the RNG based on Romeo's value. Alternatively, you can use "Alea iacta est." which seeds the RNG based on Julius Caesar's value. Not recommended if Caesar isn't in the play.
+
 ----------
 
 The following are planned features not in the original language spec that may be implemented in
@@ -63,6 +66,12 @@ Or, if you would like, you can run
     $ python splc.py [Input File] > [Output File]
     $ gcc [Output File] -lm
     $ ./a.out
+    
+Note for Ubuntu/Mint Linux users: for the gcc step, you'll need to add -lbsd to your gcc command:
+
+    $ gcc [Output File] -lm -lbsd
+    
+Not sure why that's needed, but if it's not there you'll get an error from the use of strlcat in generating error messages.
 
 The spl script should work in any bash terminal, on Windows, the explicit python method should work if you have
 all of the right programs installed. I may at some time get around to writing a .bat script for Windows users.
